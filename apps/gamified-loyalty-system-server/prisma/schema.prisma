@@ -1,0 +1,90 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Transaction {
+  admin        Admin?      @relation(fields: [adminId], references: [id])
+  adminId      String?
+  coffeeshop   Coffeeshop? @relation(fields: [coffeeshopId], references: [id])
+  coffeeshopId String?
+  createdAt    DateTime    @default(now())
+  customer     Customer?   @relation(fields: [customerId], references: [id])
+  customerId   String?
+  date         DateTime?
+  id           String      @id @default(cuid())
+  points       Int?
+  updatedAt    DateTime    @updatedAt
+}
+
+model Reward {
+  coffeeshop   Coffeeshop? @relation(fields: [coffeeshopId], references: [id])
+  coffeeshopId String?
+  createdAt    DateTime    @default(now())
+  customer     Customer?   @relation(fields: [customerId], references: [id])
+  customerId   String?
+  id           String      @id @default(cuid())
+  points       Float?
+  updatedAt    DateTime    @updatedAt
+}
+
+model QrCode {
+  code       String?
+  createdAt  DateTime  @default(now())
+  customer   Customer? @relation(fields: [customerId], references: [id])
+  customerId String?
+  id         String    @id @default(cuid())
+  isUsed     Boolean?
+  updatedAt  DateTime  @updatedAt
+}
+
+model Achievement {
+  createdAt       DateTime @default(now())
+  description     String?
+  id              String   @id @default(cuid())
+  name            String?
+  pointsThreshold Int?
+  updatedAt       DateTime @updatedAt
+}
+
+model Customer {
+  createdAt    DateTime      @default(now())
+  email        String?
+  id           String        @id @default(cuid())
+  name         String?
+  qrCodes      QrCode[]
+  rewards      Reward[]
+  transactions Transaction[]
+  updatedAt    DateTime      @updatedAt
+}
+
+model Admin {
+  coffeeshop   Coffeeshop?    @relation(fields: [coffeeshopId], references: [id])
+  coffeeshopId String?
+  createdAt    DateTime       @default(now())
+  email        String?
+  id           String         @id @default(cuid())
+  name         String?
+  role         EnumAdminRole?
+  transactions Transaction[]
+  updatedAt    DateTime       @updatedAt
+}
+
+model Coffeeshop {
+  admins       Admin[]
+  createdAt    DateTime      @default(now())
+  id           String        @id @default(cuid())
+  location     String?
+  name         String?
+  rewards      Reward[]
+  transactions Transaction[]
+  updatedAt    DateTime      @updatedAt
+}
+
+enum EnumAdminRole {
+  Option1
+}
